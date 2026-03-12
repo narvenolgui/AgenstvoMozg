@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Агентство "Мозг" · профориентация</title>
-    <!-- Chart.js для графика (подключаем всегда) -->
+    <!-- Chart.js для графика (всегда) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* ВСТАВЬТЕ СЮДА ВСЕ ВАШИ СТИЛИ (из предыдущей версии) */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             background: linear-gradient(145deg, #0b0a1a 0%, #1f1b45 70%, #2a235a 100%);
@@ -23,6 +23,7 @@
             align-items: center;
             padding: 16px;
         }
+
         .game-container {
             max-width: 520px;
             width: 100%;
@@ -34,10 +35,12 @@
             box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255, 110, 196, 0.3) inset;
             border: 1px solid rgba(255,255,255,0.08);
         }
+
         header {
             text-align: center;
             margin-bottom: 28px;
         }
+
         h1 {
             font-size: 2.4rem;
             font-weight: 800;
@@ -48,6 +51,7 @@
             letter-spacing: -0.5px;
             filter: drop-shadow(0 4px 6px #00000050);
         }
+
         .subhead {
             font-size: 1rem;
             color: #b9b3ff;
@@ -59,6 +63,7 @@
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 200, 240, 0.3);
         }
+
         .card {
             background: rgba(20, 15, 45, 0.7);
             border-radius: 36px;
@@ -68,6 +73,7 @@
             box-shadow: 0 20px 30px -10px black;
             backdrop-filter: blur(8px);
         }
+
         .situation-title {
             font-size: 1.9rem;
             font-weight: 700;
@@ -77,6 +83,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .situation-desc {
             font-size: 1.2rem;
             margin-bottom: 28px;
@@ -87,11 +94,13 @@
             border-radius: 30px;
             border-left: 4px solid #ff6ec4;
         }
+
         .answers-grid {
             display: flex;
             flex-direction: column;
             gap: 14px;
         }
+
         .answer-btn {
             background: rgba(35, 30, 60, 0.9);
             border: 2px solid rgba(255, 140, 200, 0.6);
@@ -107,16 +116,19 @@
             backdrop-filter: blur(5px);
             word-break: break-word;
         }
+
         .answer-btn:hover {
             background: rgba(70, 50, 120, 0.9);
             border-color: #ffa0d0;
             transform: scale(1.01);
             box-shadow: 0 8px 0 #1e193a;
         }
+
         .answer-btn:active {
             transform: translateY(4px);
             box-shadow: 0 2px 0 #1e193a;
         }
+
         .progress {
             text-align: center;
             font-size: 1.2rem;
@@ -126,9 +138,11 @@
             border-radius: 60px;
             margin-top: 8px;
         }
+
         .result-area {
             text-align: center;
         }
+
         .archetype {
             font-size: 2.2rem;
             font-weight: 800;
@@ -137,6 +151,7 @@
             -webkit-text-fill-color: transparent;
             margin: 12px 0 8px;
         }
+
         canvas {
             max-width: 100%;
             height: auto;
@@ -145,6 +160,7 @@
             border-radius: 40px;
             padding: 10px;
         }
+
         .btn {
             background: linear-gradient(145deg, #ff6ec4, #7873f5);
             border: none;
@@ -160,10 +176,12 @@
             margin-top: 20px;
             border: 1px solid rgba(255,255,255,0.3);
         }
+
         .btn:active {
             transform: translateY(6px);
             box-shadow: 0 4px 0 #4a2f6b;
         }
+
         footer {
             text-align: center;
             margin-top: 28px;
@@ -172,13 +190,16 @@
             border-top: 1px solid rgba(255,200,240,0.2);
             padding-top: 20px;
         }
+
         .hidden {
             display: none;
         }
+
         .icon {
             font-size: 2rem;
             margin-bottom: 8px;
         }
+
         .profession-card {
             background: rgba(255,255,255,0.08);
             border-radius: 30px;
@@ -225,19 +246,19 @@
 
 <script>
     (function() {
-        // Проверяем, открыта ли страница в Telegram (по наличию параметра tgWebApp в URL)
+        // ---------- Условная загрузка Telegram Web App (только внутри Telegram) ----------
         if (window.location.search.includes('tgWebApp')) {
-            // Динамически подгружаем скрипт Telegram
             var tgScript = document.createElement('script');
             tgScript.src = 'https://telegram.org/js/telegram-web-app.js';
             tgScript.onload = function() {
                 if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.ready(); // Сообщаем Telegram, что приложение готово
+                    Telegram.WebApp.ready();
                 }
             };
             document.head.appendChild(tgScript);
         }
-        // ---------- 15 СИТУАЦИЙ (полностью подростковый контекст) ----------
+
+        // ---------- 15 СИТУАЦИЙ (подростковый контекст) ----------
         const SITUATIONS = [
             {
                 id: 0,
@@ -658,6 +679,7 @@
             profHTML += '</div>';
             professionsDetailedEl.innerHTML = profHTML;
 
+            // График навыков
             const labels = [];
             const data = [];
             for (let [key, value] of Object.entries(currentSkills)) {
@@ -696,10 +718,7 @@
                         r: {
                             beginAtZero: true,
                             grid: { color: 'rgba(255,255,255,0.15)' },
-                            pointLabels: { 
-                                color: '#ddd', 
-                                font: { size: 10 }   // уменьшил шрифт, чтобы подписи влезали
-                            },
+                            pointLabels: { color: '#ddd', font: { size: 10 } },
                             ticks: { color: '#fff', backdropColor: 'transparent', stepSize: 2 }
                         }
                     },
@@ -708,6 +727,23 @@
                     }
                 }
             });
+
+            // ---------- Кнопка отправки результата в Telegram (если внутри Telegram) ----------
+            if (window.Telegram && Telegram.WebApp) {
+                const sendBtn = document.createElement('button');
+                sendBtn.className = 'btn';
+                sendBtn.textContent = '📤 Отправить результат в чат';
+                sendBtn.style.marginTop = '10px';
+                sendBtn.onclick = function() {
+                    const resultData = {
+                        archetype: archetype,
+                        professions: professions.map(p => p.title),
+                        skills: currentSkills
+                    };
+                    Telegram.WebApp.sendData(JSON.stringify(resultData));
+                };
+                document.querySelector('.result-area').appendChild(sendBtn);
+            }
         }
 
         restartBtn.addEventListener('click', resetGame);
@@ -716,5 +752,3 @@
 </script>
 </body>
 </html>
-
-

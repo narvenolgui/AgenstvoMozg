@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Агентство "Мозг" · профориентация</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #0b0a1a 0%, #1f1b45 70%, #2a235a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .game-container {
+            max-width: 520px;
+            width: 100%;
+            background: rgba(10, 8, 25, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 28px 20px;
+            box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(255, 110, 196, 0.3) inset;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            filter: drop-shadow(0 4px 6px #00000050);
+        }
+
+        .subhead {
+            font-size: 1rem;
+            color: #b9b3ff;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 6px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 200, 240, 0.3);
+        }
+
+        .card {
+            background: rgba(20, 15, 45, 0.7);
+            border-radius: 36px;
+            padding: 28px 22px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 130, 200, 0.3);
+            box-shadow: 0 20px 30px -10px black;
+            backdrop-filter: blur(8px);
+        }
+
+        .situation-title {
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: linear-gradient(to right, #ffe99c, #ffd5b5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .situation-desc {
+            font-size: 1.2rem;
+            margin-bottom: 28px;
+            color: #ece5ff;
+            line-height: 1.4;
+            background: rgba(0,0,0,0.2);
+            padding: 16px 18px;
+            border-radius: 30px;
+            border-left: 4px solid #ff6ec4;
+        }
+
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .answer-btn {
+            background: rgba(35, 30, 60, 0.9);
+            border: 2px solid rgba(255, 140, 200, 0.6);
+            border-radius: 60px;
+            padding: 18px 22px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 0 #130e28;
+            backdrop-filter: blur(5px);
+            word-break: break-word;
+        }
+
+        .answer-btn:hover {
+            background: rgba(70, 50, 120, 0.9);
+            border-color: #ffa0d0;
+            transform: scale(1.01);
+            box-shadow: 0 8px 0 #1e193a;
+        }
+
+        .answer-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e193a;
+        }
+
+        .progress {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #bcb0ff;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-radius: 60px;
+            margin-top: 8px;
+        }
+
+        .result-area {
+            text-align: center;
+        }
+
+        .archetype {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #f5b8ea, #b6a9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 12px 0 8px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 40px;
+            padding: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #ff6ec4, #7873f5);
+            border: none;
+            border-radius: 60px;
+            padding: 18px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 10px 0 #4a2f6b;
+            width: 100%;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #4a2f6b;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 28px;
+            color: #8a7fb0;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,200,240,0.2);
+            padding-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .profession-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 30px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+            border-left: 4px solid #ff6ec4;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app">
+    <header>
+        <div class="icon">🧠✨</div>
+        <h1>Агентство «Мозг»</h1>
+        <div class="subhead">найди себя в будущем</div>
+    </header>
+
+    <div id="gameScreen">
+        <div class="card">
+            <div class="situation-title" id="situationTitle">Загрузка...</div>
+            <div class="situation-desc" id="situationDesc"></div>
+            <div class="answers-grid" id="answersContainer"></div>
+        </div>
+        <div class="progress">
+            <span id="currentStep">1</span> / <span id="totalSteps">15</span>
+        </div>
+    </div>
+
+    <div id="resultScreen" class="hidden">
+        <div class="card result-area">
+            <h2 style="font-size: 2rem; margin-bottom: 0;">🎯 твой профиль</h2>
+            <div class="archetype" id="archetype"></div>
+            <div id="professionsDetailed" class="profession-card"></div>
+            <canvas id="skillsChart" width="300" height="300"></canvas>
+            <button class="btn" id="restartBtn">⟲ пройти заново</button>
+        </div>
+    </div>
+
+    <footer>
+        © narven_olgui 2026 · игра по профориентации
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ---------- 15 СИТУАЦИЙ (полностью подростковый контекст) ----------
+        const SITUATIONS = [
+            {
+                id: 0,
+                title: "⚡ ГОРЯЩИЙ ПРОЕКТ",
+                desc: "Учитель дал сложный проект, который нужно сдать завтра. Ты уже всё сделал, но вдруг обнаружил, что файл не открывается, а времени почти нет.",
+                answers: [
+                    { text: "Спокойно разберусь, найду причину и исправлю", effects: { analytics: 2, technical: 1 } },
+                    { text: "Напишу учителю, попрошу отсрочку, постараюсь разжалобить", effects: { communication: 2, creative: 1 } },
+                    { text: "Срочно переделаю всё заново, не спать", effects: { organization: 2, autonomy: 1 } },
+                    { text: "Попрошу помощи у друга, который шарит в этом", effects: { communication: 2, empathy: 1 } }
+                ]
+            },
+            {
+                id: 1,
+                title: "🤯 КОНФЛИКТ В КОМАНДЕ",
+                desc: "Вы делаете групповой проект. Один хочет всё делать по плану, другой — креативить и импровизировать. Они поссорились.",
+                answers: [
+                    { text: "Предложу чёткий график, чтобы всем было понятно", effects: { organization: 3 } },
+                    { text: "Поговорю с каждым, найду компромисс", effects: { empathy: 2, communication: 2 } },
+                    { text: "Разделю задачи: пусть каждый делает по-своему", effects: { autonomy: 2, leadership: 1 } },
+                    { text: "Отойду в сторону — сами разберутся", effects: { autonomy: 3 } }
+                ]
+            },
+            {
+                id: 2,
+                title: "📱 ПОСТ ДЛЯ ШКОЛЬНОГО ПАБЛИКА",
+                desc: "Нужно срочно сделать пост для школьного инстаграма про день науки. Вдохновения нет, время поджимает.",
+                answers: [
+                    { text: "Напишу текст про достижения учёных с фактами", effects: { analytics: 2, organization: 1 } },
+                    { text: "Сниму смешной тикток с ребятами из класса", effects: { creative: 3, communication: 1 } },
+                    { text: "Нарисую мем про науку", effects: { creative: 3 } },
+                    { text: "Запущу опрос в сторис и сделаю пост по результатам", effects: { communication: 2, analytics: 1 } }
+                ]
+            },
+            {
+                id: 3,
+                title: "🖨️ СЛОМАЛСЯ ПРИНТЕР",
+                desc: "Надо распечатать реферат к завтрашнему уроку, а школьный принтер зажевал бумагу и не работает. Инструкции нет.",
+                answers: [
+                    { text: "Найду видео в ютубе и попробую починить", effects: { technical: 2, analytics: 1 } },
+                    { text: "Позову учителя информатики или лаборанта", effects: { communication: 2 } },
+                    { text: "Разберу сам и соберу интуитивно", effects: { technical: 1, creative: 2 } },
+                    { text: "Пойду в интернет-кафе или к другу распечатаю", effects: { organization: 2, autonomy: 1 } }
+                ]
+            },
+            {
+                id: 4,
+                title: "💔 НОВЕНЬКИЙ В КЛАССЕ",
+                desc: "В класс пришёл новый ученик, сидит один, стесняется, ни с кем не общается.",
+                answers: [
+                    { text: "Подойду, познакомлюсь, покажу школу, позову обедать", effects: { empathy: 2, communication: 2 } },
+                    { text: "Посажу его с нами за парту, дам списать", effects: { organization: 1, empathy: 1 } },
+                    { text: "Игнорирую — пусть сам привыкает", effects: { autonomy: 2 } },
+                    { text: "Предложу войти в нашу компанию и защищу от буллинга", effects: { leadership: 2, empathy: 1 } }
+                ]
+            },
+            {
+                id: 5,
+                title: "🔬 ШКОЛЬНЫЙ ПРОЕКТ",
+                desc: "Нужно сделать проект по биологии. Можно выбрать тему: «Жизнь муравьёв» или «Создание макета ДНК».",
+                answers: [
+                    { text: "Изучу поведение муравьёв, буду наблюдать", effects: { analytics: 2, empathy: 1 } },
+                    { text: "Соберу модель ДНК из подручных материалов", effects: { technical: 2, creative: 1 } },
+                    { text: "Уговорю друзей сделать вместе и распределим роли", effects: { leadership: 2, communication: 1 } },
+                    { text: "Скачаю готовый проект из интернета", effects: { autonomy: 2 } }
+                ]
+            },
+            {
+                id: 6,
+                title: "🎨 КОНКУРС ПЛАКАТОВ",
+                desc: "В школе конкурс плакатов на тему экологии. Группа не может придумать идею.",
+                answers: [
+                    { text: "Соберу идеи, проанализирую и предложу синтез", effects: { analytics: 2, creative: 1 } },
+                    { text: "Устрою мозговой штурм с пиццей и музыкой", effects: { empathy: 2, creative: 2 } },
+                    { text: "Сам нарисую свой вариант", effects: { creative: 3, leadership: 1 } },
+                    { text: "Посмотрю тренды в Pinterest и сделаю похоже", effects: { organization: 2 } }
+                ]
+            },
+            {
+                id: 7,
+                title: "🎭 ДЕНЬ САМОУПРАВЛЕНИЯ",
+                desc: "В школе день самоуправления, нужно выбрать, кем быть: учителем, организатором концерта или помощником в столовой.",
+                answers: [
+                    { text: "Проведу урок", effects: { communication: 2, organization: 1 } },
+                    { text: "Организую концерт", effects: { creative: 2, leadership: 1 } },
+                    { text: "Буду помогать на кухне", effects: { technical: 1, organization: 1 } },
+                    { text: "Ничего не выберу, просто приду посплю", effects: { autonomy: 2 } }
+                ]
+            },
+            {
+                id: 8,
+                title: "🚗 СЕМЕЙНОЕ ПУТЕШЕСТВИЕ",
+                desc: "Родители планируют поездку на машине в другой город. Ты можешь помочь с маршрутом или взять на себя часть дел.",
+                answers: [
+                    { text: "Проложу маршрут, найду интересные места", effects: { analytics: 2, creative: 1 } },
+                    { text: "Буду штурманом, помогать водителю", effects: { organization: 2, communication: 1 } },
+                    { text: "Займусь развлечением младших в дороге", effects: { empathy: 2, creative: 1 } },
+                    { text: "Посплю всю дорогу, мне всё равно", effects: { autonomy: 2 } }
+                ]
+            },
+            {
+                id: 9,
+                title: "🧪 СТРАННОЕ ЗАДАНИЕ",
+                desc: "Учитель дал очень странное творческое задание — придумать танец дождя или написать стих про молекулу. Тебе это кажется глупым.",
+                answers: [
+                    { text: "Спрошу, зачем это нужно, и предложу альтернативу", effects: { communication: 2, analytics: 2 } },
+                    { text: "Сделаю как просит, чтобы получить пятёрку", effects: { organization: 2, autonomy: 1 } },
+                    { text: "Сделаю, но добавлю свои приколы, чтобы было круто", effects: { creative: 2, technical: 1 } },
+                    { text: "Откажусь — не хочу делать ерунду", effects: { autonomy: 3 } }
+                ]
+            },
+            {
+                id: 10,
+                title: "🚑 ЭКСТРЕННАЯ СИТУАЦИЯ",
+                desc: "На улице пожилому человеку стало плохо, он упал. Рядом никого, кроме тебя.",
+                answers: [
+                    { text: "Подбегу, попробую помочь (вызову скорую, придам удобное положение)", effects: { empathy: 3, organization: 1 } },
+                    { text: "Громко позову на помощь прохожих или взрослых", effects: { communication: 2, leadership: 1 } },
+                    { text: "Пройду мимо — не моё дело", effects: { autonomy: 2 } },
+                    { text: "Сниму на видео и выложу в соцсети, чтобы привлечь внимание", effects: { creative: 1, communication: 1 } }
+                ]
+            },
+            {
+                id: 11,
+                title: "🔧 СЛОМАЛСЯ ВЕЛОСИПЕД",
+                desc: "Твой любимый велосипед сломался посреди парка. Нужно добраться домой.",
+                answers: [
+                    { text: "Достану инструменты и попробую починить сам (умею)", effects: { technical: 3, autonomy: 1 } },
+                    { text: "Позвоню другу, чтобы приехал и помог", effects: { communication: 2 } },
+                    { text: "Оставлю велик и пойду пешком, потом заберу", effects: { organization: 1, autonomy: 2 } },
+                    { text: "Попытаюсь доехать до ближайшей мастерской на сломанном", effects: { technical: 1, creative: 1 } }
+                ]
+            },
+            {
+                id: 12,
+                title: "🍳 ГОСТИ НАПАЛИ",
+                desc: "К тебе неожиданно пришли друзья (человек 5), а в холодильнике минимум продуктов.",
+                answers: [
+                    { text: "Приготовлю что-то необычное и вкусное из того, что есть (импровизация)", effects: { creative: 3, organization: 1 } },
+                    { text: "Быстро закажу готовую еду с доставкой", effects: { organization: 2 } },
+                    { text: "Попрошу друзей принести что-то с собой (совместный ужин)", effects: { communication: 2, empathy: 1 } },
+                    { text: "Сделаю простые бутерброды и чай", effects: { organization: 1, autonomy: 2 } }
+                ]
+            },
+            {
+                id: 13,
+                title: "📚 ПОМОЩЬ МЛАДШЕМУ",
+                desc: "Младший брат/сестра не понимает домашнее задание по математике и плачет.",
+                answers: [
+                    { text: "Сяду и терпеливо объясню, даже если придётся повторить 10 раз", effects: { empathy: 3, communication: 1 } },
+                    { text: "Быстро решу за него и пойду по своим делам", effects: { autonomy: 1, organization: 1 } },
+                    { text: "Предложу посмотреть обучающее видео на ютубе вместе", effects: { creative: 1, empathy: 1 } },
+                    { text: "Позову родителей, пусть они разбираются", effects: { communication: 1, organization: 1 } }
+                ]
+            },
+            {
+                id: 14,
+                title: "🖌️ ПОКРАСЬ КОМНАТУ",
+                desc: "Родители попросили тебя самостоятельно покрасить стену в своей комнате. Краска и кисти уже куплены.",
+                answers: [
+                    { text: "Аккуратно всё сделаю сам, стараясь не наляпать", effects: { technical: 2, organization: 2 } },
+                    { text: "Позову друга помочь — вместе веселее", effects: { communication: 2 } },
+                    { text: "Скажу, что не умею, пусть нанимают мастера", effects: { autonomy: 2 } },
+                    { text: "Сделаю, но добавлю креативные узоры (станет оригинально)", effects: { creative: 2, technical: 1 } }
+                ]
+            }
+        ];
+
+        // ---------- Начальные навыки ----------
+        const SKILLS = {
+            analytics: 0,
+            creative: 0,
+            communication: 0,
+            organization: 0,
+            empathy: 0,
+            technical: 0,
+            leadership: 0,
+            autonomy: 0
+        };
+
+        // ---------- РАСШИРЕННАЯ БАЗА ПРОФЕССИЙ (35+) ----------
+        const PROFESSIONS = [
+            // IT и аналитика
+            { title: "Data Scientist", skills: ["analytics", "technical"], 
+              salary: "Junior: 80–120 тыс. ₽, Middle: 150–250 тыс. ₽, Senior: от 300 тыс. ₽",
+              education: "МФТИ (ПМИ), ВШЭ (наука о данных), МГУ (ВМК), курсы: Яндекс.Практикум, SkillFactory" },
+            { title: "Разработчик ПО", skills: ["technical", "analytics"], 
+              salary: "Junior: 100–150 тыс. ₽, Middle: 200–300 тыс. ₽, Senior: от 350 тыс. ₽",
+              education: "МФТИ, Бауманка, МИРЭА, МИФИ, курсы: Яндекс.Практикум, Skillbox" },
+            { title: "Системный аналитик", skills: ["analytics", "communication"], 
+              salary: "Junior: 90–130 тыс. ₽, Middle: 160–220 тыс. ₽, Senior: от 250 тыс. ₽",
+              education: "ВШЭ (бизнес-информатика), МФТИ, РЭУ, курсы: Нетология, ProductStar" },
+            { title: "Специалист по кибербезопасности", skills: ["technical", "analytics"], 
+              salary: "Junior: 100–150 тыс. ₽, Middle: 180–280 тыс. ₽, Senior: от 300 тыс. ₽",
+              education: "МИФИ, Бауманка, МФТИ, курсы: CyberEd, Skillbox" },
+            { title: "DevOps-инженер", skills: ["technical", "organization"], 
+              salary: "120–350 тыс. ₽",
+              education: "Онлайн-курсы: Slurm, Яндекс.Практикум, МФТИ (технические специальности)" },
+            
+            // Медицина и психология
+            { title: "Врач-терапевт", skills: ["empathy", "analytics"], 
+              salary: "Интерн: 40–60 тыс. ₽, врач: 80–150 тыс. ₽, заведующий: от 200 тыс. ₽",
+              education: "МГМУ им. Сеченова, РНИМУ им. Пирогова, МГМСУ, РУДН (лечебное дело)" },
+            { title: "Хирург", skills: ["technical", "empathy", "analytics"], 
+              salary: "80–400 тыс. ₽",
+              education: "Те же вузы, ординатура по хирургии" },
+            { title: "Медсестра/Медбрат", skills: ["empathy", "organization"], 
+              salary: "30–80 тыс. ₽",
+              education: "Медицинские колледжи: №1, №2, №5, МГОК" },
+            { title: "Психолог", skills: ["empathy", "communication"], 
+              salary: "45–120 тыс. ₽, частная практика от 150 тыс. ₽",
+              education: "МГУ (психфак), МГППУ, РГГУ, ВШЭ (психология), курсы профпереподготовки" },
+            { title: "Ветеринар", skills: ["empathy", "technical"], 
+              salary: "50–150 тыс. ₽",
+              education: "МГАВМиБ им. Скрябина, РУДН (ветеринария)" },
+            
+            // Рабочие специальности
+            { title: "Повар/Кондитер", skills: ["creative", "organization"], 
+              salary: "Повар: 40–80 тыс. ₽, шеф-повар: от 120 тыс. ₽",
+              education: "Колледжи: Пищевой колледж №33, МГУТУ им. Разумовского, курсы: Novikov School, Ask the Chef" },
+            { title: "Автомеханик", skills: ["technical", "organization"], 
+              salary: "50–100 тыс. ₽, мастер-приёмщик: от 120 тыс. ₽",
+              education: "МАДИ (колледж), Автомеханический колледж, МГОК, курсы профобучения" },
+            { title: "Электрик", skills: ["technical", "analytics"], 
+              salary: "45–90 тыс. ₽, бригадир: от 110 тыс. ₽",
+              education: "Колледжи: МКЭиИТ, МГОК, МГКЭТ, курсы при учебных центрах" },
+            { title: "Сварщик", skills: ["technical", "organization"], 
+              salary: "40–130 тыс. ₽",
+              education: "Колледжи: МГОК, МКЭиИТ, курсы сварщиков" },
+            { title: "Строитель (отделочник)", skills: ["technical", "organization"], 
+              salary: "40–90 тыс. ₽, прораб: от 120 тыс. ₽",
+              education: "Колледжи: МОК ЗАПАД, МГОК, КСУ №54, курсы" },
+            
+            // Творчество и дизайн
+            { title: "Графический дизайнер", skills: ["creative", "technical"], 
+              salary: "Junior: 50–80 тыс. ₽, Middle: 90–150 тыс. ₽, Senior: от 180 тыс. ₽",
+              education: "Британка, ВШЭ (дизайн), МГУ (искусствоведение), курсы: Contented, Skillbox" },
+            { title: "SMM-менеджер", skills: ["creative", "communication"], 
+              salary: "Junior: 60–90 тыс. ₽, Middle: 100–150 тыс. ₽, Senior: от 180 тыс. ₽",
+              education: "МГУ (журфак), ВШЭ (медиа), РГГУ, курсы: Skillbox, Нетология, Bang Bang Education" },
+            { title: "Фотограф", skills: ["creative", "technical"], 
+              salary: "от 50 до 300 тыс. ₽ (фриланс/студия)",
+              education: "Школы фотографии: Photoplay, Академия фотографии, МГУ (журфак), курсы" },
+            { title: "Архитектор", skills: ["creative", "analytics", "technical"], 
+              salary: "80–300 тыс. ₽",
+              education: "МАРХИ, МГСУ, МАМИ" },
+            { title: "Дизайнер интерьеров", skills: ["creative", "organization"], 
+              salary: "60–250 тыс. ₽",
+              education: "Британка, МГАХИ, курсы: Skillbox, Geometrium" },
+            
+            // Образование и наука
+            { title: "Учитель начальных классов", skills: ["empathy", "communication"], 
+              salary: "45–90 тыс. ₽ (в Москве с надбавками)",
+              education: "МПГУ, МГПУ, МГУ (педагогика), педколледжи №4, №13" },
+            { title: "Преподаватель вуза", skills: ["analytics", "communication"], 
+              salary: "50–150 тыс. ₽",
+              education: "МГУ, ВШЭ, МФТИ, аспирантура" },
+            { title: "Научный сотрудник", skills: ["analytics", "autonomy"], 
+              salary: "60–200 тыс. ₽",
+              education: "МГУ, МФТИ, РАН, аспирантура" },
+            
+            // Спорт и фитнес
+            { title: "Спортивный тренер", skills: ["communication", "leadership"], 
+              salary: "40–120 тыс. ₽",
+              education: "РГУФКСМиТ, МГАФК, колледжи физической культуры" },
+            { title: "Фитнес-инструктор", skills: ["communication", "empathy"], 
+              salary: "40–120 тыс. ₽",
+              education: "Курсы: FitMost, колледжи" },
+            
+            // Юриспруденция и экономика
+            { title: "Юрист", skills: ["analytics", "communication"], 
+              salary: "Junior: 50–80 тыс. ₽, Middle: 90–150 тыс. ₽, Senior: от 200 тыс. ₽",
+              education: "МГУ (юрфак), МГЮА, ВШЭ (право), РУДН" },
+            { title: "Экономист", skills: ["analytics", "organization"], 
+              salary: "50–200 тыс. ₽",
+              education: "ВШЭ, РЭУ им. Плеханова, МГУ (эконом)" },
+            { title: "Бухгалтер", skills: ["analytics", "organization"], 
+              salary: "40–150 тыс. ₽",
+              education: "РЭУ, колледжи, курсы 1С" },
+            
+            // Логистика и управление
+            { title: "Логист", skills: ["organization", "analytics"], 
+              salary: "50–150 тыс. ₽",
+              education: "РУТ (МИИТ), ГУУ, ВШЭ (менеджмент), колледжи" },
+            { title: "Project Manager", skills: ["organization", "leadership"], 
+              salary: "Junior: 80–120 тыс. ₽, Middle: 150–200 тыс. ₽, Senior: от 250 тыс. ₽",
+              education: "ВШЭ (менеджмент), РАНХиГС, курсы: Нетология, ProductStar" },
+            { title: "Предприниматель", skills: ["leadership", "creative"], 
+              salary: "от 100 тыс. до 1 млн+ ₽",
+              education: "Сколково, ВШЭ, РАНХиГС, бизнес-школы" },
+            
+            // Обслуживание и сервис
+            { title: "Парикмахер", skills: ["creative", "communication"], 
+              salary: "40–150 тыс. ₽",
+              education: "Колледжи сферы услуг, курсы: Persona, Beauty School" },
+            { title: "Косметолог", skills: ["technical", "empathy"], 
+              salary: "50–200 тыс. ₽",
+              education: "Медколледжи, курсы: Академия красоты" },
+            { title: "Бариста", skills: ["communication", "organization"], 
+              salary: "35–80 тыс. ₽",
+              education: "Школы бариста: Coffee Institute, колледжи" },
+            { title: "Эколог", skills: ["analytics", "empathy"], 
+              salary: "40–120 тыс. ₽",
+              education: "МГУ (почвоведение), РУДН (экология), МИТХТ" }
+        ];
+
+        // Текущие данные игры
+        let currentSkills = { ...SKILLS };
+        let currentSituationIndex = 0;
+        let chartInstance = null;
+
+        // DOM-элементы
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const situationTitle = document.getElementById('situationTitle');
+        const situationDesc = document.getElementById('situationDesc');
+        const answersContainer = document.getElementById('answersContainer');
+        const currentStepSpan = document.getElementById('currentStep');
+        const totalStepsSpan = document.getElementById('totalSteps');
+        const archetypeEl = document.getElementById('archetype');
+        const professionsDetailedEl = document.getElementById('professionsDetailed');
+        const restartBtn = document.getElementById('restartBtn');
+
+        totalStepsSpan.textContent = SITUATIONS.length;
+
+        function resetGame() {
+            currentSkills = { ...SKILLS };
+            currentSituationIndex = 0;
+            gameScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+            renderSituation();
+        }
+
+        function renderSituation() {
+            if (currentSituationIndex >= SITUATIONS.length) {
+                showResult();
+                return;
+            }
+            const sit = SITUATIONS[currentSituationIndex];
+            situationTitle.textContent = sit.title;
+            situationDesc.textContent = sit.desc;
+            currentStepSpan.textContent = currentSituationIndex + 1;
+
+            answersContainer.innerHTML = '';
+            sit.answers.forEach((ans) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = ans.text;
+                btn.addEventListener('click', () => handleAnswer(ans.effects));
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(effects) {
+            for (let [skill, value] of Object.entries(effects)) {
+                if (currentSkills.hasOwnProperty(skill)) {
+                    currentSkills[skill] += value;
+                }
+            }
+            currentSituationIndex++;
+            renderSituation();
+        }
+
+        function getProfessionScore(prof, skills) {
+            let score = 0;
+            for (let s of prof.skills) {
+                score += skills[s] || 0;
+            }
+            return score;
+        }
+
+        function calculateResult() {
+            const sortedSkills = Object.entries(currentSkills)
+                .sort((a, b) => b[1] - a[1])
+                .map(entry => entry[0]);
+            const topSkill = sortedSkills[0];
+
+            let archetype = '';
+            switch (topSkill) {
+                case 'creative': archetype = 'Креативный генератор'; break;
+                case 'analytics': archetype = 'Аналитик данных'; break;
+                case 'communication': archetype = 'Душа компании'; break;
+                case 'organization': archetype = 'Мастер порядка'; break;
+                case 'empathy': archetype = 'Эмпат-психолог'; break;
+                case 'technical': archetype = 'Техногик'; break;
+                case 'leadership': archetype = 'Прирождённый лидер'; break;
+                case 'autonomy': archetype = 'Свободный художник'; break;
+                default: archetype = 'Исследователь';
+            }
+
+            const scored = PROFESSIONS.map(prof => ({
+                ...prof,
+                score: getProfessionScore(prof, currentSkills)
+            }));
+            scored.sort((a, b) => b.score - a.score);
+            const topProfessions = scored.slice(0, 4);
+
+            return { archetype, professions: topProfessions };
+        }
+
+        function showResult() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const { archetype, professions } = calculateResult();
+            archetypeEl.textContent = archetype;
+
+            let profHTML = '<div style="margin: 16px 0;"><h3 style="color: #ffd966;">🔥 Твои профессии</h3>';
+            professions.forEach(prof => {
+                profHTML += `
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 24px; padding: 16px; margin: 12px 0; text-align: left;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #ffb3b3;">${prof.title}</div>
+                        <div style="font-size: 1.1rem; color: #a0e7a0; margin: 8px 0;">💰 ${prof.salary}</div>
+                        <div style="font-size: 1rem; color: #b0c4ff;">🏫 ${prof.education}</div>
+                    </div>
+                `;
+            });
+            profHTML += '</div>';
+            professionsDetailedEl.innerHTML = profHTML;
+
+            const labels = [];
+            const data = [];
+            for (let [key, value] of Object.entries(currentSkills)) {
+                let displayName = {
+                    analytics: 'Аналитика', creative: 'Креатив', communication: 'Коммуникация',
+                    organization: 'Организация', empathy: 'Эмпатия', technical: 'Техника',
+                    leadership: 'Лидерство', autonomy: 'Автономность'
+                }[key] || key;
+                labels.push(displayName);
+                data.push(value);
+            }
+
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'уровень навыка',
+                        data: data,
+                        backgroundColor: 'rgba(255, 110, 196, 0.3)',
+                        borderColor: '#ff9acb',
+                        pointBackgroundColor: '#b5a9ff',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#b5a9ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.15)' },
+                            pointLabels: { 
+                                color: '#ddd', 
+                                font: { size: 10 }   // уменьшил шрифт, чтобы подписи влезали
+                            },
+                            ticks: { color: '#fff', backdropColor: 'transparent', stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff', font: { size: 12 } } }
+                    }
+                }
+            });
+        }
+
+        restartBtn.addEventListener('click', resetGame);
+        resetGame();
+    })();
+</script>
+</body>
+</html>
